@@ -24,7 +24,7 @@ public class ApiControllers {
         return jsonPath.getList("", User.class);
     }
 
-    public static void createUser(User user) {
+    public static void createUser(User user, boolean successStatus, int code) {
         given().urlEncodingEnabled(true)
                 .param("username", user.getUsername())
                 .param("password", user.getPassword())
@@ -32,18 +32,12 @@ public class ApiControllers {
                 .header("Accept", ContentType.JSON.getAcceptHeader())
                 .post(CREATE_USER)
                 .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("success", is(true));
+                .statusCode(code)
+                .body("success", is(successStatus));
     }
 
     public static User getUserByUserName(String username) {
-        JsonPath jsonPath = given()
-                .when()
-                .get(GET_USER)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().body().jsonPath();
-        return jsonPath.getList("", User.class).stream().filter(element -> element.getUsername().equals(username)).toList().getFirst();
+        return getUsers().stream().filter(element -> element.getUsername().equals(username)).toList().getFirst();
     }
 
 }
